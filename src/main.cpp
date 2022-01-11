@@ -35,10 +35,10 @@ void setexp8(){
 }
 
 //setup frequencies/phase increments, starting at C4=0 to B5. (A4 is defined as 440Hz)
-unsigned int tone_inc[24];
+unsigned int tone_inc[108];
 void settones() {
-  for (byte i=0; i<24; i++){
-    tone_inc[i]= 440.0 * pow(2.0, ( (i-9) / 12.0)) * 65536.0 / (16000000.0/512) + 0.5;
+  for (byte i=21; i<108; i++){
+    tone_inc[i]= 27.0 * pow(2.0, ( (i-9) / 12.0)) * 65536.0 / (16000000.0/512) + 0.5;
   }
 }
 
@@ -81,7 +81,12 @@ void setup() {
   ADCSRB=B00000000; // freerun
   ADMUX =B01100000; // Vcc ref, left-align, ch0
 
+  Serial.begin(9600);
 }
+
+// Midi Input
+static byte input[3];
+static int index = 0;
 
 
 //initialize the main parameters of the pulse length setting
@@ -164,60 +169,60 @@ void loop() {
   
   byte keypressed = nokey;
   byte keyreleased = nokey;
-  if(butstatD1!=prevbutstatD1){
-    if ( (butstatD1 & (1<<0)) == 0 and (prevbutstatD1 & (1<<0)) >  0 ) keypressed  =  0;
-    if ( (butstatD1 & (1<<0)) >  0 and (prevbutstatD1 & (1<<0)) == 0 ) keyreleased =  0;
-    if ( (butstatD1 & (1<<1)) == 0 and (prevbutstatD1 & (1<<1)) >  0 ) keypressed  =  1;
-    if ( (butstatD1 & (1<<1)) >  0 and (prevbutstatD1 & (1<<1)) == 0 ) keyreleased =  1;
-    if ( (butstatD1 & (1<<2)) == 0 and (prevbutstatD1 & (1<<2)) >  0 ) keypressed  =  2;
-    if ( (butstatD1 & (1<<2)) >  0 and (prevbutstatD1 & (1<<2)) == 0 ) keyreleased =  2;
-    if ( (butstatD1 & (1<<3)) == 0 and (prevbutstatD1 & (1<<3)) >  0 ) keypressed  =  3;
-    if ( (butstatD1 & (1<<3)) >  0 and (prevbutstatD1 & (1<<3)) == 0 ) keyreleased =  3;
-    if ( (butstatD1 & (1<<4)) == 0 and (prevbutstatD1 & (1<<4)) >  0 ) keypressed  =  4;
-    if ( (butstatD1 & (1<<4)) >  0 and (prevbutstatD1 & (1<<4)) == 0 ) keyreleased =  4;
-    if ( (butstatD1 & (1<<5)) == 0 and (prevbutstatD1 & (1<<5)) >  0 ) keypressed  =  5;
-    if ( (butstatD1 & (1<<5)) >  0 and (prevbutstatD1 & (1<<5)) == 0 ) keyreleased =  5;
-    if ( (butstatD1 & (1<<6)) == 0 and (prevbutstatD1 & (1<<6)) >  0 ) keypressed  =  6;
-    if ( (butstatD1 & (1<<6)) >  0 and (prevbutstatD1 & (1<<6)) == 0 ) keyreleased =  6;
-    if ( (butstatD1 & (1<<7)) == 0 and (prevbutstatD1 & (1<<7)) >  0 ) keypressed  =  7;
-    if ( (butstatD1 & (1<<7)) >  0 and (prevbutstatD1 & (1<<7)) == 0 ) keyreleased =  7;
-  }
-  if(butstatD2!=prevbutstatD2){
-    if ( (butstatD2 & (1<<0)) == 0 and (prevbutstatD2 & (1<<0)) >  0 ) keypressed  =  8;
-    if ( (butstatD2 & (1<<0)) >  0 and (prevbutstatD2 & (1<<0)) == 0 ) keyreleased =  8;
-    if ( (butstatD2 & (1<<1)) == 0 and (prevbutstatD2 & (1<<1)) >  0 ) keypressed  =  9;
-    if ( (butstatD2 & (1<<1)) >  0 and (prevbutstatD2 & (1<<1)) == 0 ) keyreleased =  9;
-    if ( (butstatD2 & (1<<2)) == 0 and (prevbutstatD2 & (1<<2)) >  0 ) keypressed  = 10;
-    if ( (butstatD2 & (1<<2)) >  0 and (prevbutstatD2 & (1<<2)) == 0 ) keyreleased = 10;
-    if ( (butstatD2 & (1<<3)) == 0 and (prevbutstatD2 & (1<<3)) >  0 ) keypressed  = 11;
-    if ( (butstatD2 & (1<<3)) >  0 and (prevbutstatD2 & (1<<3)) == 0 ) keyreleased = 11;
-    if ( (butstatD2 & (1<<4)) == 0 and (prevbutstatD2 & (1<<4)) >  0 ) keypressed  = 12;
-    if ( (butstatD2 & (1<<4)) >  0 and (prevbutstatD2 & (1<<4)) == 0 ) keyreleased = 12;
-    if ( (butstatD2 & (1<<5)) == 0 and (prevbutstatD2 & (1<<5)) >  0 ) keypressed  = 13;
-    if ( (butstatD2 & (1<<5)) >  0 and (prevbutstatD2 & (1<<5)) == 0 ) keyreleased = 13;
-    if ( (butstatD2 & (1<<6)) == 0 and (prevbutstatD2 & (1<<6)) >  0 ) keypressed  = 14;
-    if ( (butstatD2 & (1<<6)) >  0 and (prevbutstatD2 & (1<<6)) == 0 ) keyreleased = 14;
-    if ( (butstatD2 & (1<<7)) == 0 and (prevbutstatD2 & (1<<7)) >  0 ) keypressed  = 15;
-    if ( (butstatD2 & (1<<7)) >  0 and (prevbutstatD2 & (1<<7)) == 0 ) keyreleased = 15;
-  }
-  if(butstatD3!=prevbutstatD3){
-    if ( (butstatD3 & (1<<0)) == 0 and (prevbutstatD3 & (1<<0)) >  0 ) keypressed  = 16;
-    if ( (butstatD3 & (1<<0)) >  0 and (prevbutstatD3 & (1<<0)) == 0 ) keyreleased = 16;
-    if ( (butstatD3 & (1<<1)) == 0 and (prevbutstatD3 & (1<<1)) >  0 ) keypressed  = 17;
-    if ( (butstatD3 & (1<<1)) >  0 and (prevbutstatD3 & (1<<1)) == 0 ) keyreleased = 17;
-    if ( (butstatD3 & (1<<2)) == 0 and (prevbutstatD3 & (1<<2)) >  0 ) keypressed  = 18;
-    if ( (butstatD3 & (1<<2)) >  0 and (prevbutstatD3 & (1<<2)) == 0 ) keyreleased = 18;
-    if ( (butstatD3 & (1<<3)) == 0 and (prevbutstatD3 & (1<<3)) >  0 ) keypressed  = 19;
-    if ( (butstatD3 & (1<<3)) >  0 and (prevbutstatD3 & (1<<3)) == 0 ) keyreleased = 19;
-    if ( (butstatD3 & (1<<4)) == 0 and (prevbutstatD3 & (1<<4)) >  0 ) keypressed  = 20;
-    if ( (butstatD3 & (1<<4)) >  0 and (prevbutstatD3 & (1<<4)) == 0 ) keyreleased = 20;
-    if ( (butstatD3 & (1<<5)) == 0 and (prevbutstatD3 & (1<<5)) >  0 ) keypressed  = 21;
-    if ( (butstatD3 & (1<<5)) >  0 and (prevbutstatD3 & (1<<5)) == 0 ) keyreleased = 21;
-    if ( (butstatD3 & (1<<6)) == 0 and (prevbutstatD3 & (1<<6)) >  0 ) keypressed  = 22;
-    if ( (butstatD3 & (1<<6)) >  0 and (prevbutstatD3 & (1<<6)) == 0 ) keyreleased = 22;
-    if ( (butstatD3 & (1<<7)) == 0 and (prevbutstatD3 & (1<<7)) >  0 ) keypressed  = 23;
-    if ( (butstatD3 & (1<<7)) >  0 and (prevbutstatD3 & (1<<7)) == 0 ) keyreleased = 23;
-  }
+  // if(butstatD1!=prevbutstatD1){
+  //   if ( (butstatD1 & (1<<0)) == 0 and (prevbutstatD1 & (1<<0)) >  0 ) keypressed  =  0;
+  //   if ( (butstatD1 & (1<<0)) >  0 and (prevbutstatD1 & (1<<0)) == 0 ) keyreleased =  0;
+  //   if ( (butstatD1 & (1<<1)) == 0 and (prevbutstatD1 & (1<<1)) >  0 ) keypressed  =  1;
+  //   if ( (butstatD1 & (1<<1)) >  0 and (prevbutstatD1 & (1<<1)) == 0 ) keyreleased =  1;
+  //   if ( (butstatD1 & (1<<2)) == 0 and (prevbutstatD1 & (1<<2)) >  0 ) keypressed  =  2;
+  //   if ( (butstatD1 & (1<<2)) >  0 and (prevbutstatD1 & (1<<2)) == 0 ) keyreleased =  2;
+  //   if ( (butstatD1 & (1<<3)) == 0 and (prevbutstatD1 & (1<<3)) >  0 ) keypressed  =  3;
+  //   if ( (butstatD1 & (1<<3)) >  0 and (prevbutstatD1 & (1<<3)) == 0 ) keyreleased =  3;
+  //   if ( (butstatD1 & (1<<4)) == 0 and (prevbutstatD1 & (1<<4)) >  0 ) keypressed  =  4;
+  //   if ( (butstatD1 & (1<<4)) >  0 and (prevbutstatD1 & (1<<4)) == 0 ) keyreleased =  4;
+  //   if ( (butstatD1 & (1<<5)) == 0 and (prevbutstatD1 & (1<<5)) >  0 ) keypressed  =  5;
+  //   if ( (butstatD1 & (1<<5)) >  0 and (prevbutstatD1 & (1<<5)) == 0 ) keyreleased =  5;
+  //   if ( (butstatD1 & (1<<6)) == 0 and (prevbutstatD1 & (1<<6)) >  0 ) keypressed  =  6;
+  //   if ( (butstatD1 & (1<<6)) >  0 and (prevbutstatD1 & (1<<6)) == 0 ) keyreleased =  6;
+  //   if ( (butstatD1 & (1<<7)) == 0 and (prevbutstatD1 & (1<<7)) >  0 ) keypressed  =  7;
+  //   if ( (butstatD1 & (1<<7)) >  0 and (prevbutstatD1 & (1<<7)) == 0 ) keyreleased =  7;
+  // }
+  // if(butstatD2!=prevbutstatD2){
+  //   if ( (butstatD2 & (1<<0)) == 0 and (prevbutstatD2 & (1<<0)) >  0 ) keypressed  =  8;
+  //   if ( (butstatD2 & (1<<0)) >  0 and (prevbutstatD2 & (1<<0)) == 0 ) keyreleased =  8;
+  //   if ( (butstatD2 & (1<<1)) == 0 and (prevbutstatD2 & (1<<1)) >  0 ) keypressed  =  9;
+  //   if ( (butstatD2 & (1<<1)) >  0 and (prevbutstatD2 & (1<<1)) == 0 ) keyreleased =  9;
+  //   if ( (butstatD2 & (1<<2)) == 0 and (prevbutstatD2 & (1<<2)) >  0 ) keypressed  = 10;
+  //   if ( (butstatD2 & (1<<2)) >  0 and (prevbutstatD2 & (1<<2)) == 0 ) keyreleased = 10;
+  //   if ( (butstatD2 & (1<<3)) == 0 and (prevbutstatD2 & (1<<3)) >  0 ) keypressed  = 11;
+  //   if ( (butstatD2 & (1<<3)) >  0 and (prevbutstatD2 & (1<<3)) == 0 ) keyreleased = 11;
+  //   if ( (butstatD2 & (1<<4)) == 0 and (prevbutstatD2 & (1<<4)) >  0 ) keypressed  = 12;
+  //   if ( (butstatD2 & (1<<4)) >  0 and (prevbutstatD2 & (1<<4)) == 0 ) keyreleased = 12;
+  //   if ( (butstatD2 & (1<<5)) == 0 and (prevbutstatD2 & (1<<5)) >  0 ) keypressed  = 13;
+  //   if ( (butstatD2 & (1<<5)) >  0 and (prevbutstatD2 & (1<<5)) == 0 ) keyreleased = 13;
+  //   if ( (butstatD2 & (1<<6)) == 0 and (prevbutstatD2 & (1<<6)) >  0 ) keypressed  = 14;
+  //   if ( (butstatD2 & (1<<6)) >  0 and (prevbutstatD2 & (1<<6)) == 0 ) keyreleased = 14;
+  //   if ( (butstatD2 & (1<<7)) == 0 and (prevbutstatD2 & (1<<7)) >  0 ) keypressed  = 15;
+  //   if ( (butstatD2 & (1<<7)) >  0 and (prevbutstatD2 & (1<<7)) == 0 ) keyreleased = 15;
+  // }
+  // if(butstatD3!=prevbutstatD3){
+  //   if ( (butstatD3 & (1<<0)) == 0 and (prevbutstatD3 & (1<<0)) >  0 ) keypressed  = 16;
+  //   if ( (butstatD3 & (1<<0)) >  0 and (prevbutstatD3 & (1<<0)) == 0 ) keyreleased = 16;
+  //   if ( (butstatD3 & (1<<1)) == 0 and (prevbutstatD3 & (1<<1)) >  0 ) keypressed  = 17;
+  //   if ( (butstatD3 & (1<<1)) >  0 and (prevbutstatD3 & (1<<1)) == 0 ) keyreleased = 17;
+  //   if ( (butstatD3 & (1<<2)) == 0 and (prevbutstatD3 & (1<<2)) >  0 ) keypressed  = 18;
+  //   if ( (butstatD3 & (1<<2)) >  0 and (prevbutstatD3 & (1<<2)) == 0 ) keyreleased = 18;
+  //   if ( (butstatD3 & (1<<3)) == 0 and (prevbutstatD3 & (1<<3)) >  0 ) keypressed  = 19;
+  //   if ( (butstatD3 & (1<<3)) >  0 and (prevbutstatD3 & (1<<3)) == 0 ) keyreleased = 19;
+  //   if ( (butstatD3 & (1<<4)) == 0 and (prevbutstatD3 & (1<<4)) >  0 ) keypressed  = 20;
+  //   if ( (butstatD3 & (1<<4)) >  0 and (prevbutstatD3 & (1<<4)) == 0 ) keyreleased = 20;
+  //   if ( (butstatD3 & (1<<5)) == 0 and (prevbutstatD3 & (1<<5)) >  0 ) keypressed  = 21;
+  //   if ( (butstatD3 & (1<<5)) >  0 and (prevbutstatD3 & (1<<5)) == 0 ) keyreleased = 21;
+  //   if ( (butstatD3 & (1<<6)) == 0 and (prevbutstatD3 & (1<<6)) >  0 ) keypressed  = 22;
+  //   if ( (butstatD3 & (1<<6)) >  0 and (prevbutstatD3 & (1<<6)) == 0 ) keyreleased = 22;
+  //   if ( (butstatD3 & (1<<7)) == 0 and (prevbutstatD3 & (1<<7)) >  0 ) keypressed  = 23;
+  //   if ( (butstatD3 & (1<<7)) >  0 and (prevbutstatD3 & (1<<7)) == 0 ) keyreleased = 23;
+  // }
   
   setPWM(); //#1
 
@@ -227,22 +232,77 @@ void loop() {
   setPWM(); //#2
 
   //readout one pot
-  byte potval=ADCH;
+  // byte potval=ADCH;
 
-  //interpret pot values  
-  if(ipot==7) ADSR_a  = 4096;//exp8[255-potval]>>4;     // range: 4096-256-16 = 8ms-128ms-2s  
-  if(ipot==6) ADSR_d  = 16;//exp8[255-potval]>>4;
-  if(ipot==5) ADSR_s  = 255;//potval<<8;          // range 0-255 = 0.0-0.5-1.0
-  if(ipot==4) ADSR_r  = 120;//exp8[255-potval]>>4;
-  if(ipot==3) FM_inc  = 512;//exp8[potval]>>4;         // range 16-256-4096 = fm/fc 0.06 - 1.0 - 16
-  if(ipot==2) FM_a1   = -1;//(exp8[potval]-258)>>4;   // range 0 -240 -4080 ~ beta 0 - 1 -16
-  if(ipot==1) FM_a2   = -1;//(exp8[potval]-258)>>4;
-  if(ipot==0) FM_dec  = 1;//exp8[255-potval]>>4;
+  // //interpret pot values  
+  // if(ipot==7) ADSR_a  = 4096;//exp8[255-potval]>>4;     // range: 4096-256-16 = 8ms-128ms-2s  
+  // if(ipot==6) ADSR_d  = 16;//exp8[255-potval]>>4;
+  // if(ipot==5) ADSR_s  = 255;//potval<<8;          // range 0-255 = 0.0-0.5-1.0
+  // if(ipot==4) ADSR_r  = 120;//exp8[255-potval]>>4;
+  // if(ipot==3) FM_inc  = 512;//exp8[potval]>>4;         // range 16-256-4096 = fm/fc 0.06 - 1.0 - 16
+  // if(ipot==2) FM_a1   = -1;//(exp8[potval]-258)>>4;   // range 0 -240 -4080 ~ beta 0 - 1 -16
+  // if(ipot==1) FM_a2   = -1;//(exp8[potval]-258)>>4;
+  // if(ipot==0) FM_dec  = 1;//exp8[255-potval]>>4;
+  // unsigned int FM_a0=FM_a2;
+  // int          FM_da=FM_a1-FM_a2;  
+  // ipot++;
+  // if (ipot>=npot) ipot=0;
+  
+  // Serial
+  if(UCSR0A & (1<<RXC0))
+  {
+    input[index++] = UDR0;
+  }
+
+  if (index == 3) 
+  {
+    if(input[0] >= 0xb0 && input[0] <= 0xbf)
+    {
+      if(input [1] >= 0x14 && input[1] <= 0x1f)
+      {
+        int val = input[2]*2;
+        switch(input[1] - 0x14)
+        {
+          case 0:
+            FM_dec = exp8[255-val]>>4;
+            break;
+          case 1:
+            FM_a2 = (exp8[val]-258)>>4;
+            break;
+          case 2:
+            FM_a1 = (exp8[val]-258)>>4;
+            break;
+          case 3:
+            FM_inc = exp8[val]>>4;
+            break;
+          case 4:
+            ADSR_r = exp8[255-val]>>4;
+            break;
+          case 5:
+            ADSR_s = val<<8;
+            break;
+          case 6:
+            ADSR_d = exp8[255-val]>>4;
+            break;
+          case 7:
+            ADSR_a = exp8[255-val]>>4;
+            break;
+        }
+      }
+    }
+    else if(input[0] >= 0x90 && input[0] <= 0x9f)
+    {
+      keypressed = input[1];
+    }
+    else if(input[0] >= 0x80 && input[0] <= 0x8f)
+    {
+      keyreleased = input[1];
+    }
+    index = 0;
+  }
   unsigned int FM_a0=FM_a2;
   int          FM_da=FM_a1-FM_a2;  
-  ipot++;
-  if (ipot>=npot) ipot=0;
-  
+
   setPWM(); //#3
 
 
