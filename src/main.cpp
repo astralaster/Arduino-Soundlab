@@ -87,6 +87,7 @@ void setup() {
 // Midi Input
 static byte input[3];
 static int index = 0;
+static int velocity = 0;
 
 
 //initialize the main parameters of the pulse length setting
@@ -293,6 +294,7 @@ void loop() {
     else if(input[0] >= 0x90 && input[0] <= 0x9f)
     {
       keypressed = input[1];
+      velocity = input[2];
     }
     else if(input[0] >= 0x80 && input[0] <= 0x8f)
     {
@@ -334,7 +336,7 @@ void loop() {
   //initiate new note if needed
   if (keypressed != nokey) {
     phase[nextch]=0;
-    amp_base[nextch] = 64;
+    amp_base[nextch] = 64 * (velocity/127.0f);
     inc_base[nextch] = tone_inc[keypressed];
     iADSR[nextch] = 1;
     FMphase[nextch]=0;
