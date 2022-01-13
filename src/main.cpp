@@ -38,7 +38,7 @@ void setexp8(){
 unsigned int tone_inc[108];
 void settones() {
   for (byte i=21; i<108; i++){
-    tone_inc[i]= 27.0 * pow(2.0, ( (i-9) / 12.0)) * 65536.0 / (16000000.0/512) + 0.5;
+    tone_inc[i]= 27.5 * pow(2.0, ( (i-21) / 12.0)) * 65536.0 / (16000000.0/512) + 0.5;
   }
 }
 
