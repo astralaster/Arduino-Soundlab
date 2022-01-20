@@ -131,15 +131,15 @@ inline void setPWM() {
   OCR1A = val/128 + 256;
 }
 
-//instrument parameters  
-unsigned int ADSR_a  = 0;  
-unsigned int ADSR_d  = 0;
+//instrument parameters default piano 
+unsigned int ADSR_a  = 4096;  
+unsigned int ADSR_d  = 8;
 unsigned int ADSR_s  = 0;    
-unsigned int ADSR_r  = 0;
-unsigned int FM_inc  = 0;
-unsigned int FM_a1   = 0;
-unsigned int FM_a2   = 0;
-unsigned int FM_dec  = 0;
+unsigned int ADSR_r  = 64;
+unsigned int FM_inc  = 256;
+unsigned int FM_a1   = 128;
+unsigned int FM_a2   = 64;
+unsigned int FM_dec  = 64;
 
 //properties of each note played
 byte         iADSR[nch]     = {0, 0, 0, 0}; 
